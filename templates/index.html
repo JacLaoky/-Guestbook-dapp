@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Message Board dApp</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+</head>
+<body>
+  <div class="container">
+    <h1>📝 Message Board dApp</h1>
+    <p class="subtitle">Store a message on the Sepolia blockchain. Anyone can read it, anyone can change it.</p>
+
+    <div class="card">
+      <button id="connectBtn">Connect Wallet</button>
+      <p id="account" class="small">Not connected</p>
+      <a id="mobileLink" class="mobile-link hidden" href="#">Open in MetaMask App</a>
+    </div>
+
+    <div class="card">
+      <h2>Current Message</h2>
+      <p id="message" class="message">Loading...</p>
+      <p class="small">Last updated by: <span id="lastSender">-</span></p>
+      <p class="small">Total updates: <span id="updateCount">-</span></p>
+      <button id="refreshBtn" class="secondary">Refresh</button>
+    </div>
+
+    <div class="card">
+      <h2>Set a New Message</h2>
+      <input id="newMessage" type="text" placeholder="Type your message..." />
+      <button id="setBtn">Update Message</button>
+      <p id="status" class="small"></p>
+    </div>
+
+    <p class="footer small">Contract: <span id="contract">{{ contract_address or "not set" }}</span></p>
+  </div>
+
+  <script>
+    const CONTRACT_ADDRESS = "{{ contract_address }}";
+    const RPC_URL = "{{ rpc_url }}";
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/ethers@6.13.4/dist/ethers.umd.min.js"></script>
+  <script src="{{ url_for('static', filename='app.js') }}"></script>
+</body>
+</html>
