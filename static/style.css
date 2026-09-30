@@ -1,0 +1,84 @@
+:root {
+  --bg: #0f1220; --card: #181c2f; --text: #e8eaf6; --muted: #9aa0c3;
+  --accent: #7c5cff; --accent-2: #22d3ee; --ok: #34d399; --err: #f87171;
+  --border: #2a2f4a; --pink: #f472b6; --gold: #fbbf24;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0; font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  background: var(--bg); color: var(--text); line-height: 1.5;
+}
+a { color: var(--accent-2); }
+.wrap { max-width: 720px; margin: 0 auto; padding: 32px 16px 64px; }
+h1 { margin: 0 0 4px; font-size: 1.9rem; }
+.sub { color: var(--muted); margin: 0 0 24px; }
+.card {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 14px; padding: 20px; margin-bottom: 20px;
+}
+.card h2 { margin: 0 0 12px; font-size: 1.1rem; }
+button {
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  color: #fff; border: 0; border-radius: 10px; padding: 10px 18px;
+  font-weight: 600; cursor: pointer; font-size: 0.95rem;
+}
+button:disabled { opacity: 0.5; cursor: not-allowed; }
+button.small {
+  background: #232845; border: 1px solid var(--border); padding: 6px 12px;
+  font-size: 0.85rem; font-weight: 500;
+}
+button.small.liked { color: var(--pink); border-color: var(--pink); }
+.row { display: flex; justify-content: space-between; gap: 12px; padding: 6px 0;
+       border-bottom: 1px dashed var(--border); flex-wrap: wrap; }
+.row:last-child { border-bottom: 0; }
+.label { color: var(--muted); }
+.mono { font-family: ui-monospace, Menlo, Consolas, monospace; word-break: break-all; }
+textarea, input[type=number] {
+  width: 100%; background: #10142a; color: var(--text);
+  border: 1px solid var(--border); border-radius: 10px; padding: 10px; font: inherit;
+}
+textarea { min-height: 80px; resize: vertical; margin-bottom: 6px; }
+.counter { color: var(--muted); font-size: 0.8rem; text-align: right; margin-bottom: 10px; }
+.status { margin-top: 10px; font-size: 0.9rem; min-height: 1.2em; word-break: break-word; }
+.status.ok { color: var(--ok); } .status.err { color: var(--err); }
+.entry { padding: 14px 0; border-bottom: 1px solid var(--border); }
+.entry:last-child { border-bottom: 0; }
+.entry .text { white-space: pre-wrap; word-break: break-word; }
+.entry .meta { color: var(--muted); font-size: 0.8rem; margin: 4px 0 8px; }
+.actions { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.tips { color: var(--gold); font-size: 0.85rem; }
+.tip-row { display: flex; gap: 8px; align-items: center; margin-bottom: 14px; }
+.tip-row input { max-width: 160px; }
+.empty { color: var(--muted); font-style: italic; }
+.hidden { display: none !important; }
+.banner {
+  background: #3b2a10; border: 1px solid #7a5516; color: #fcd34d;
+  border-radius: 12px; padding: 12px 14px; margin-bottom: 20px; font-size: 0.9rem;
+}
+.stats { display: flex; gap: 12px; margin-bottom: 20px; }
+.stat { flex: 1; background: var(--card); border: 1px solid var(--border);
+        border-radius: 12px; padding: 12px; text-align: center; }
+.stat b { display: block; font-size: 1.3rem; }
+.stat span { color: var(--muted); font-size: 0.8rem; }
+.btn-link {
+  display: inline-block; text-decoration: none; text-align: center;
+  background: #f6851b; color: #fff; border-radius: 10px; padding: 10px 18px;
+  font-weight: 600; font-size: 0.95rem; margin-top: 10px;
+}
+.hint { color: var(--muted); font-size: 0.85rem; margin: 10px 0 0; }
+footer { color: var(--muted); font-size: 0.8rem; text-align: center; margin-top: 24px; }
+button, .btn-link { -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
+
+/* ---------- Mobile ---------- */
+@media (max-width: 600px) {
+  .wrap { padding: 20px 12px 40px; }
+  h1 { font-size: 1.5rem; }
+  .sub { font-size: 0.95rem; }
+  .card { padding: 16px; border-radius: 12px; }
+  button:not(.small), .btn-link { width: 100%; padding: 14px 18px; font-size: 1rem; }
+  button.small { padding: 10px 14px; flex: 1; }
+  .row { flex-direction: column; gap: 2px; }
+  textarea, input[type=number] { font-size: 16px; } /* prevents iOS zoom on focus */
+  .tip-row input { max-width: none; }
+  .stat b { font-size: 1.1rem; }
+}
