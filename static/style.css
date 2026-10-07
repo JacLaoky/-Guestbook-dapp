@@ -6,7 +6,7 @@ body {
 }
 
 .container {
-  max-width: 560px;
+  max-width: 1040px;
   margin: 0 auto;
   padding: 32px 16px;
 }
@@ -69,6 +69,16 @@ button.secondary { background: #334155; }
   font-weight: 600;
 }
 
+/* Two columns on desktop: actions on the left, history on the right */
+.layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  align-items: start;
+}
+.col { min-width: 0; } /* keep long addresses from widening a column */
+.history-card { max-height: calc(100vh - 160px); overflow-y: auto; }
+
 .history { list-style: none; padding: 0; margin: 0; }
 .history li {
   display: flex;
@@ -87,6 +97,11 @@ button.danger { background: #dc2626; }
 .footer { text-align: center; margin-top: 24px; }
 
 /* Mobile */
+@media (max-width: 800px) {
+  .layout { grid-template-columns: 1fr; }
+  .history-card { max-height: none; }
+}
+
 @media (max-width: 600px) {
   h1 { font-size: 1.5rem; }
   button, .mobile-link { width: 100%; padding: 14px; text-align: center; box-sizing: border-box; }
