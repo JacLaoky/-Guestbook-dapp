@@ -67,6 +67,28 @@ def add_message():
     return jsonify({"id": cur.lastrowid}), 201
 
 
+@app.route("/api/messages/sync", methods=["POST"])
+def sync_message():
+    """Record the current on-chain message if it was changed outside this website
+    (e.g. in Remix or Etherscan) and is not the latest record yet."""
+    data = request.get_json() or {}
+    content = (data.get("content") or "").strip()
+    sender = (data.get("sender") or "").strip()
+    if not content or not sender:
+        return jsonify({"added": False})
+
+    with get_db() as conn:
+        latest = conn.execute(
+            "SELECT content, sender FROM messages ORDER BY id DESC LIMIT 1"
+        ).fetchone()
+        if latest and latest["content"] == content and latest["sender"].lower() == sender.lower():
+            return jsonify({"added": False})
+        conn.execute(
+            "INSERT INTO messages (content, sender) VALUES (?, ?)", (content, sender)
+        )
+    return jsonify({"added": True})
+
+
 @app.route("/api/messages/<int:message_id>", methods=["DELETE"])
 def delete_message(message_id):
     with get_db() as conn:

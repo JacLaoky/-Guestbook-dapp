@@ -43,9 +43,19 @@ async function connectWallet() {
 // 2. Read the message from the blockchain (free, no gas)
 async function loadMessage() {
   try {
-    document.getElementById("message").innerText = await readContract.message();
-    document.getElementById("lastSender").innerText = await readContract.lastSender();
+    const message = await readContract.message();
+    const lastSender = await readContract.lastSender();
+    document.getElementById("message").innerText = message;
+    document.getElementById("lastSender").innerText = lastSender;
     document.getElementById("updateCount").innerText = (await readContract.updateCount()).toString();
+
+    // If the message was changed outside this website, add it to the history too
+    const res = await fetch("/api/messages/sync", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ content: message, sender: lastSender })
+    });
+    if ((await res.json()).added) loadHistory();
   } catch (err) {
     document.getElementById("message").innerText = "Could not load the message.";
     console.error(err);
