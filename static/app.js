@@ -47,13 +47,14 @@ async function loadMessage() {
     const lastSender = await readContract.lastSender();
     document.getElementById("message").innerText = message;
     document.getElementById("lastSender").innerText = lastSender;
-    document.getElementById("updateCount").innerText = (await readContract.updateCount()).toString();
+    const updateCount = Number(await readContract.updateCount());
+    document.getElementById("updateCount").innerText = updateCount;
 
     // If the message was changed outside this website, add it to the history too
     const res = await fetch("/api/messages/sync", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ content: message, sender: lastSender })
+      body: JSON.stringify({ content: message, sender: lastSender, update_count: updateCount })
     });
     if ((await res.json()).added) loadHistory();
   } catch (err) {
@@ -83,6 +84,7 @@ async function setMessage() {
 
     status.innerText = "Waiting for the transaction to be confirmed...";
     await tx.wait();
+    const updateCount = Number(await contract.updateCount());
 
     // Save a copy to the database (Create)
     await fetch("/api/messages", {
@@ -91,7 +93,8 @@ async function setMessage() {
       body: JSON.stringify({
         content: newMessage,
         sender: await signer.getAddress(),
-        tx_hash: tx.hash
+        tx_hash: tx.hash,
+        update_count: updateCount
       })
     });
 

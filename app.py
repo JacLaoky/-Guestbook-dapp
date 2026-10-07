@@ -30,6 +30,26 @@ def init_db():
                 created_at TEXT DEFAULT CURRENT_TIMESTAMP
             )
         """)
+        # Remembers the last on-chain updateCount already saved to history,
+        # so a deleted record is never synced back in again
+        conn.execute("""
+            CREATE TABLE IF NOT EXISTS sync_state (
+                id                INTEGER PRIMARY KEY CHECK (id = 1),
+                last_update_count INTEGER NOT NULL
+            )
+        """)
+        conn.execute("INSERT OR IGNORE INTO sync_state (id, last_update_count) VALUES (1, 0)")
+
+
+def last_synced_count(conn):
+    return conn.execute("SELECT last_update_count FROM sync_state WHERE id = 1").fetchone()[0]
+
+
+def mark_synced(conn, update_count):
+    conn.execute(
+        "UPDATE sync_state SET last_update_count = MAX(last_update_count, ?) WHERE id = 1",
+        (update_count,),
+    )
 
 
 init_db()
@@ -64,28 +84,31 @@ def add_message():
             "INSERT INTO messages (content, sender, tx_hash) VALUES (?, ?, ?)",
             (content, sender, data.get("tx_hash")),
         )
+        if data.get("update_count") is not None:
+            mark_synced(conn, int(data["update_count"]))
     return jsonify({"id": cur.lastrowid}), 201
 
 
 @app.route("/api/messages/sync", methods=["POST"])
 def sync_message():
     """Record the current on-chain message if it was changed outside this website
-    (e.g. in Remix or Etherscan) and is not the latest record yet."""
+    (e.g. in Remix or Etherscan). Uses the contract's updateCount so each on-chain
+    update is saved at most once, even if its record is deleted later."""
     data = request.get_json() or {}
     content = (data.get("content") or "").strip()
     sender = (data.get("sender") or "").strip()
-    if not content or not sender:
+    update_count = data.get("update_count")
+    if not content or not sender or update_count is None:
         return jsonify({"added": False})
 
+    update_count = int(update_count)
     with get_db() as conn:
-        latest = conn.execute(
-            "SELECT content, sender FROM messages ORDER BY id DESC LIMIT 1"
-        ).fetchone()
-        if latest and latest["content"] == content and latest["sender"].lower() == sender.lower():
+        if update_count <= last_synced_count(conn):
             return jsonify({"added": False})
         conn.execute(
             "INSERT INTO messages (content, sender) VALUES (?, ?)", (content, sender)
         )
+        mark_synced(conn, update_count)
     return jsonify({"added": True})
 
 
