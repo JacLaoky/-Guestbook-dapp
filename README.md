@@ -103,3 +103,6 @@ on the page, or open the site URL inside your wallet app's built-in browser
 | GET    | `/`           | The dApp web page                            |
 | GET    | `/api/config` | Contract address, network settings and ABI   |
 | GET    | `/health`     | Health check for Render                      |
+| GET    | `/api/messages`      | List message history (SQLite)         |
+| POST   | `/api/messages`      | Add a record `{content, sender, tx_hash}` |
+| DELETE | `/api/messages/<id>` | Delete a record                       |

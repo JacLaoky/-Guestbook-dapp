@@ -69,6 +69,20 @@ button.secondary { background: #334155; }
   font-weight: 600;
 }
 
+.history { list-style: none; padding: 0; margin: 0; }
+.history li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 0;
+  border-bottom: 1px solid #334155;
+}
+.history li:last-child { border-bottom: none; }
+.history-msg { font-weight: 600; word-break: break-word; }
+.history button { width: auto; padding: 6px 12px; font-size: 0.85rem; }
+button.danger { background: #dc2626; }
+
 .hidden { display: none; }
 .footer { text-align: center; margin-top: 24px; }
 

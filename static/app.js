@@ -74,12 +74,58 @@ async function setMessage() {
     status.innerText = "Waiting for the transaction to be confirmed...";
     await tx.wait();
 
+    // Save a copy to the database (Create)
+    await fetch("/api/messages", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        content: newMessage,
+        sender: await signer.getAddress(),
+        tx_hash: tx.hash
+      })
+    });
+
     status.innerText = "✅ Message updated!";
     document.getElementById("newMessage").value = "";
     loadMessage();
+    loadHistory();
   } catch (err) {
     status.innerText = "❌ " + (err.shortMessage || err.message);
   }
+}
+
+// 4. Read the message history from the database (Read)
+async function loadHistory() {
+  const list = document.getElementById("history");
+  const rows = await (await fetch("/api/messages")).json();
+  list.innerHTML = "";
+  if (rows.length === 0) {
+    list.innerHTML = '<li class="small">No records yet.</li>';
+    return;
+  }
+  for (const row of rows) {
+    const li = document.createElement("li");
+    const text = document.createElement("div");
+    text.innerHTML = '<div class="history-msg"></div><div class="small"></div>';
+    text.children[0].innerText = row.content;
+    text.children[1].innerText = row.sender.slice(0, 8) + "... · " + row.created_at;
+
+    const btn = document.createElement("button");
+    btn.className = "danger";
+    btn.innerText = "Delete";
+    btn.onclick = () => deleteHistory(row.id);
+
+    li.append(text, btn);
+    list.append(li);
+  }
+}
+
+// 5. Delete a record from the database (Delete)
+// Note: this only removes the database copy; the blockchain itself cannot be changed.
+async function deleteHistory(id) {
+  if (!confirm("Delete this record?")) return;
+  await fetch("/api/messages/" + id, { method: "DELETE" });
+  loadHistory();
 }
 
 document.getElementById("connectBtn").onclick = connectWallet;
@@ -87,3 +133,4 @@ document.getElementById("refreshBtn").onclick = loadMessage;
 document.getElementById("setBtn").onclick = setMessage;
 
 loadMessage();
+loadHistory();
